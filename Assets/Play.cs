@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using TMPro;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,9 +14,7 @@ using Random = UnityEngine.Random;
 
 public class Play : MonoBehaviour
 {
-    public AudioSource test;
-    public AudioSource drums;
-    public AudioSource guitar;
+    
     public InputField bpm;
     public InputField skipChance;
     public InputField maxInRow;
@@ -42,25 +41,26 @@ public class Play : MonoBehaviour
     private int chanceToSkip = 0;
     private int maxInaRow = 3;
     private int maxJump;
-    private AudioClip clip;
     
-    private AudioClip generatedClip;
     private string soundPath;
+    private AudioClip clip;
+    private AudioClip generatedClip;
+    
+    public AudioSource test;
+    public AudioSource drums;
+    public AudioSource background;
+    public AudioSource secondbackground;
+
+    private Button button;
+    private TextMeshPro backgroundText;
     
     void Start()
     {
-        
-        
-        
         changeBPM();
         setChanceToSkip();
         setMaxInRow();
         setMaxJump();
-        
 
-       // AudioClip clip = (AudioClip)Resources.Load("D:\\Unity projekty\\Generowanie ścieżki dźwiękowej\\guitar3", typeof(AudioClip)); 
-       // guitar.clip = clip;
-        
         minorProgression[0] = 2;
         minorProgression[1] = 1;
         minorProgression[2] = 2;
@@ -71,6 +71,9 @@ public class Play : MonoBehaviour
         
         fillAMinorScale();
         setUsedSounds();
+
+        button = GameObject.FindGameObjectWithTag("Background").GetComponent<Button>();
+        backgroundText = GameObject.Find("BackgroundText").GetComponent<TextMeshPro>();
     }
     
     private IEnumerator LoadAudio()
@@ -80,14 +83,12 @@ public class Play : MonoBehaviour
 
         generatedClip = request.GetAudioClip();
 
-        PlayAudioFile();
+        AssignAudioFile();
     }
 
-    private void PlayAudioFile()
+    private void AssignAudioFile()
     {
-        guitar.clip = generatedClip;
-        //audioSource.Play();
-        //audioSource.loop = true;
+        background.clip = generatedClip;
     }
 
     private WWW GetAudioFromFile(string path)
@@ -97,13 +98,17 @@ public class Play : MonoBehaviour
         return request;
     }
 
-    public void changeClip()
+    public void changeClip(int track)
     {
-        //soundPath = EditorUtility.OpenFilePanel("Wybierz plik z rozszerzeniem .wav", "", "wav");
-
+        Debug.Log(track);
+        FileSelector.GetFile(GotFile, ".wav");
+    }
+    
+    void GotFile(FileSelector.Status status, string path){
+        Debug.Log("File Status : "+status+", Path : "+path);
+        soundPath = path;
+        backgroundText.text = path;
         StartCoroutine(LoadAudio());
-        
-        
         pitchText.text = soundPath;
     }
 
@@ -160,7 +165,7 @@ public class Play : MonoBehaviour
         mainCounter = 0f;
         
         drums.Play();
-        guitar.Play();
+        background.Play();
     }
 
     public void playBackground()
@@ -168,7 +173,7 @@ public class Play : MonoBehaviour
         drums.time = 4.15f;
         mainCounter = 0f;
         drums.Play();
-        guitar.Play();
+        background.Play();
     }
 
     public void playGenerated()
@@ -180,13 +185,13 @@ public class Play : MonoBehaviour
     {
         play = false;
         drums.Stop();
-        guitar.Stop();
+        background.Stop();
     }
 
     public void stopBackground()
     {
         drums.Stop();
-        guitar.Stop();
+        background.Stop();
     }
 
     public void stopGenerated()
