@@ -1,0 +1,13 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/projectSettingsUpdater.xml
+/modules.xml
+/contentModel.xml
+/.idea.Generowanie ścieżki dźwiękowej.iml
+# Datasource local storage ignored files
+/../../../../../../:\Unity projekty\Generowanie ścieżki dźwiękowej\.idea\.idea.Generowanie ścieżki dźwiękowej\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
