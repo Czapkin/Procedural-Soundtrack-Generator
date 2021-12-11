@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using TMPro;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -41,6 +39,8 @@ public class Play : MonoBehaviour
     private int chanceToSkip = 0;
     private int maxInaRow = 3;
     private int maxJump;
+    private int trackNumber = -1;
+    private bool modalOpened = false;
     
     private string soundPath;
     private AudioClip clip;
@@ -51,11 +51,15 @@ public class Play : MonoBehaviour
     public AudioSource background;
     public AudioSource secondbackground;
 
-    private Button button;
-    private TextMeshPro backgroundText;
-    
+    private Button setBackground;
+
+    private Slider backgroundVolumeSlider;
+
     void Start()
     {
+        setBackground = GameObject.Find("SetBackground").GetComponent<Button>();
+        backgroundVolumeSlider = GameObject.Find("BackgroundVolume").GetComponent<Slider>();
+        
         changeBPM();
         setChanceToSkip();
         setMaxInRow();
@@ -72,8 +76,18 @@ public class Play : MonoBehaviour
         fillAMinorScale();
         setUsedSounds();
 
-        button = GameObject.FindGameObjectWithTag("Background").GetComponent<Button>();
-        backgroundText = GameObject.Find("BackgroundText").GetComponent<TextMeshPro>();
+        
+    }
+
+    public void changeVolume(int track)
+    {
+        
+        switch (track)
+        {
+            case 0:
+                background.volume = backgroundVolumeSlider.value;
+                break;
+        }
     }
     
     private IEnumerator LoadAudio()
@@ -88,7 +102,13 @@ public class Play : MonoBehaviour
 
     private void AssignAudioFile()
     {
-        background.clip = generatedClip;
+        switch (trackNumber)
+        {
+            case 0:
+                background.clip = generatedClip;
+                setBackground.GetComponentInChildren<Text>().text = Path.GetFileName(soundPath);
+                break;
+        }
     }
 
     private WWW GetAudioFromFile(string path)
@@ -100,16 +120,23 @@ public class Play : MonoBehaviour
 
     public void changeClip(int track)
     {
-        Debug.Log(track);
-        FileSelector.GetFile(GotFile, ".wav");
+        if (!modalOpened)
+        {
+            FileSelector.GetFile(GotFile, ".wav");
+            trackNumber = track;
+            modalOpened = true;
+        }
+
     }
     
     void GotFile(FileSelector.Status status, string path){
         Debug.Log("File Status : "+status+", Path : "+path);
-        soundPath = path;
-        backgroundText.text = path;
-        StartCoroutine(LoadAudio());
-        pitchText.text = soundPath;
+        if(status.ToString() == "Successful")
+        {
+            soundPath = path;
+            StartCoroutine(LoadAudio());
+        }
+        modalOpened = false;
     }
 
     public void fillAMinorScale()
