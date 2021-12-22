@@ -17,11 +17,11 @@ public class Play : MonoBehaviour
     public InputField skipChance;
     public InputField maxInRow;
     public InputField maxJumpInput;
-    public InputField clipName;
     
     public float[] scale = new float[8];
     public float[] usedSounds = new float[8];
     private int[] minorProgression = new int[7];
+    private int[] majorProgression = new int[7];
     public Text pitchText;
 
     private float trackedTime = 0f;
@@ -30,7 +30,6 @@ public class Play : MonoBehaviour
     private bool played = false;
     private int bpmInt;
     private double secondsPerBeat;
-    private int sampleNote = 0;
     private int rand;
     private int previousRand;
     private int tickCounter = 0;
@@ -41,6 +40,10 @@ public class Play : MonoBehaviour
     private int maxJump;
     private int trackNumber = -1;
     private bool modalOpened = false;
+    private int sampleNote = 0;
+    private int trackNote = 0;
+    private bool isMajor = true;
+    private int differenceBetween;
     
     private string soundPath;
     private AudioClip clip;
@@ -75,15 +78,19 @@ public class Play : MonoBehaviour
     public Toggle loopGenerated;
     public InputField generatedStartOffset;
 
+    public Dropdown sampleNoteDropdown;
+    public Dropdown trackNoteDropdown;
+    public Dropdown trackScaleDropdown;
+
     void Start()
     {
-        //setBackground = GameObject.Find("SetSound").GetComponent<Button>();
-        //backgroundVolumeSlider = GameObject.Find("BackgroundVolume").GetComponent<Slider>();
-        
+
         changeBPM();
         setChanceToSkip();
         setMaxInRow();
         setMaxJump();
+        setSampleNote();
+        setTrackNote();
 
         minorProgression[0] = 2;
         minorProgression[1] = 1;
@@ -92,11 +99,79 @@ public class Play : MonoBehaviour
         minorProgression[4] = 1;
         minorProgression[5] = 2;
         minorProgression[6] = 2;
+
+        majorProgression[0] = 2;
+        majorProgression[1] = 2;
+        majorProgression[2] = 1;
+        majorProgression[3] = 2;
+        majorProgression[4] = 2;
+        majorProgression[5] = 2;
+        majorProgression[6] = 1;
         
-        fillAMinorScale();
+        fillScale();
         setUsedSounds();
 
         
+    }
+
+    public void setSampleNote()
+    {
+        sampleNote = sampleNoteDropdown.value;
+        findDifference();
+        fillScale();
+        setUsedSounds();
+    }
+    
+    public void setTrackNote()
+    {
+        trackNote = trackNoteDropdown.value;
+        findDifference();
+        fillScale();
+        setUsedSounds();
+    }
+    
+    public void setTrackScale()
+    {
+        if (trackScaleDropdown.value == 0)
+            isMajor = true;
+        else
+            isMajor = false;
+        
+        fillScale();
+        setUsedSounds();
+    }
+
+    private void findDifference()
+    {
+        int seekRight;
+        int seekLeft;
+        if (trackNote < sampleNote)
+        {
+            seekRight = sampleNote - trackNote;
+            seekLeft = trackNote + Math.Abs(sampleNote - 12);
+
+            if (Math.Abs(seekRight) <= Math.Abs(seekLeft))
+            {
+                differenceBetween = seekRight * -1;
+            } else
+            {
+                differenceBetween =  seekLeft;
+            }
+                
+        }
+        else
+        {
+            seekRight = trackNote - sampleNote;
+            seekLeft = sampleNote + Math.Abs(trackNote - 12);
+
+            if (Math.Abs(seekRight) <= Math.Abs(seekLeft))
+            {
+                differenceBetween = seekRight;
+            } else
+            {
+                differenceBetween =  seekLeft * -1;
+            }
+        }
     }
 
     public void changeVolume(int track)
@@ -321,17 +396,34 @@ public class Play : MonoBehaviour
         modalOpened = false;
     }
 
-    public void fillAMinorScale()
+    public void fillScale()
     {
-        for (int i = 0; i < 8; i++)
+        if (isMajor)
         {
-            if (i == 0)
+            for (int i = 0; i < 8; i++)
             {
-                scale[i] = -3;
+                if (i == 0)
+                {
+                    scale[i] = differenceBetween;
+                }
+                else
+                {
+                    scale[i] = scale[i - 1] + majorProgression[i - 1];
+                }
             }
-            else
+        }
+        else
+        {
+            for (int i = 0; i < 8; i++)
             {
-                scale[i] = scale[i - 1] + minorProgression[i - 1];
+                if (i == 0)
+                {
+                    scale[i] = differenceBetween;
+                }
+                else
+                {
+                    scale[i] = scale[i - 1] + minorProgression[i - 1];
+                }
             }
         }
     }
@@ -509,20 +601,21 @@ public class Play : MonoBehaviour
                    rand = Random.Range(0, 8);
                }
                 
-               generated.pitch = usedSounds[rand];
-
-               if (previousRand == rand)
-                   replayCounter++;
-               else
-                   replayCounter = 0;
+               
                
                gap = Random.Range(1, 100);
 
                if (gap < chanceToSkip)
                {
+                   generated.pitch = usedSounds[rand];
+
+                   if (previousRand == rand)
+                       replayCounter++;
+                   else
+                       replayCounter = 0;
+                   
                    generated.Play();
                    pitchText.text = rand.ToString();
-                   
                }
                played = true;
                tickCounter++;
