@@ -258,7 +258,7 @@ public class FileSelector : MonoBehaviour
 	/// </param>
 	public static void GetFile(SelectFileFunction Callback = null, string extension = ".*")
 	{
-		GetFile(Application.dataPath, Callback, extension);
+		GetFile(Directory.GetCurrentDirectory(), Callback, extension);
 	}
 	
 	#endregion

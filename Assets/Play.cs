@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using TMPro;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -18,11 +18,10 @@ public class Play : MonoBehaviour
     public InputField maxInRow;
     public InputField maxJumpInput;
     
-    public float[] scale = new float[8];
+    public int[] scale = new int[8];
     public float[] usedSounds = new float[8];
-    private int[] minorProgression = new int[7];
-    private int[] majorProgression = new int[7];
-    public Text pitchText;
+    public int[] minorProgression = new int[7];
+    public int[] majorProgression = new int[7];
 
     private float trackedTime = 0f;
     private float mainCounter = 0f;
@@ -35,15 +34,17 @@ public class Play : MonoBehaviour
     private int tickCounter = 0;
     private int replayCounter = 0;
     private int gap;
-    private int chanceToSkip = 0;
+    private int chanceToPlay = 0;
     private int maxInaRow = 3;
     private int maxJump;
     private int trackNumber = -1;
     private bool modalOpened = false;
-    private int sampleNote = 0;
-    private int trackNote = 0;
-    private bool isMajor = true;
-    private int differenceBetween;
+    public int sampleNote = 0;
+    public int trackNote = 0;
+    public bool isMajor = true;
+    public int differenceBetween;
+    public float backgroundOffset;
+    public int whileCounter = 0;
     
     private string soundPath;
     private AudioClip clip;
@@ -81,6 +82,11 @@ public class Play : MonoBehaviour
     public Dropdown sampleNoteDropdown;
     public Dropdown trackNoteDropdown;
     public Dropdown trackScaleDropdown;
+    
+    public Image[] pianoImages = new Image[12];
+    public Button helpButton;
+    
+    public AudioRenderer ar = new AudioRenderer();
 
     void Start()
     {
@@ -91,6 +97,8 @@ public class Play : MonoBehaviour
         setMaxJump();
         setSampleNote();
         setTrackNote();
+        setTrackScale();
+        
 
         minorProgression[0] = 2;
         minorProgression[1] = 1;
@@ -141,7 +149,22 @@ public class Play : MonoBehaviour
         setUsedSounds();
     }
 
-    private void findDifference()
+    public void goToHelp()
+    {
+        SceneManager.LoadScene("Help");
+    }
+
+    public void goToMain()
+    {
+        SceneManager.LoadScene("Main");
+    }
+
+    public void quitApplication()
+    {
+        Application.Quit();
+    }
+
+    public void findDifference()
     {
         int seekRight;
         int seekLeft;
@@ -226,9 +249,6 @@ public class Play : MonoBehaviour
             case 2:
                 custom.loop = loopCustom.isOn;
                 break;
-            case 3:
-                generated.loop = loopGenerated.isOn;
-                break;
         }
     }
 
@@ -240,48 +260,40 @@ public class Play : MonoBehaviour
                 try
                 {
                     backgroundStartOffset.text = float.Parse(backgroundStartOffset.text.Replace(".", ",")).ToString("0.00");
-                    background.time = float.Parse(backgroundStartOffset.text);
                 }
                 catch (FormatException e)
                 {
                     backgroundStartOffset.text = "0,00";
-                    background.time = float.Parse(backgroundStartOffset.text);
                 }
                 break;
             case 1:
                 try
                 {
                     drumsStartOffset.text = float.Parse(drumsStartOffset.text.Replace(".", ",")).ToString("0.00");
-                    drums.time = float.Parse(drumsStartOffset.text);
                 }
                 catch (FormatException e)
                 {
                     drumsStartOffset.text = "0,00";
-                    drums.time = float.Parse(drumsStartOffset.text);
                 }
                 break;
             case 2:
                 try
                 {
                     customStartOffset.text = float.Parse(customStartOffset.text.Replace(".", ",")).ToString("0.00");
-                    custom.time = float.Parse(customStartOffset.text);
                 }
                 catch (FormatException e)
                 {
                     customStartOffset.text = "0,00";
-                    custom.time = float.Parse(customStartOffset.text);
                 }
                 break;
             case 3:
                 try
                 {
                     generatedStartOffset.text = float.Parse(generatedStartOffset.text.Replace(".", ",")).ToString("0.00");
-                    generated.time = float.Parse(generatedStartOffset.text);
                 }
                 catch (FormatException e)
                 {
                     generatedStartOffset.text = "0,00";
-                    generated.time = float.Parse(generatedStartOffset.text);
                 }
                 break;
         }
@@ -325,8 +337,6 @@ public class Play : MonoBehaviour
             case 3:
                 generatedStartOffset.text = "0,00";
                 generated.time = float.Parse(backgroundStartOffset.text);
-                generated.loop = true;
-                loopGenerated.isOn = true;
                 generated.mute = false;
                 muteGenerated.isOn = false;
                 generated.volume = 0.5f;
@@ -343,6 +353,13 @@ public class Play : MonoBehaviour
         generatedClip = request.GetAudioClip();
 
         AssignAudioFile();
+    }
+    
+    public WWW GetAudioFromFile(string path)
+    {
+        string audioToLoad = string.Format(path);
+        WWW request = new WWW(audioToLoad);
+        return request;
     }
 
     private void AssignAudioFile()
@@ -366,13 +383,6 @@ public class Play : MonoBehaviour
                 setGenerated.GetComponentInChildren<Text>().text = Path.GetFileName(soundPath);
                 break;
         }
-    }
-
-    private WWW GetAudioFromFile(string path)
-    {
-        string audioToLoad = string.Format(path);
-        WWW request = new WWW(audioToLoad);
-        return request;
     }
 
     public void setClip(int track)
@@ -432,10 +442,11 @@ public class Play : MonoBehaviour
     {
         for (int i = 0; i < 8; i++)
         {
-            usedSounds[i] = (float)Math.Pow(2, scale[i]/12f);//(float)Math.Pow(1.0594630943592953, scale[i]);
+            usedSounds[i] = (float)Math.Pow(2, scale[i]/12f);
         }
     }
-    
+
+
     public void changeBPM()
     {
         bpmInt = int.Parse(bpm.text);
@@ -444,34 +455,79 @@ public class Play : MonoBehaviour
 
     public void setChanceToSkip()
     {
-        chanceToSkip = 100 - (int.Parse(skipChance.text));
+        chanceToPlay = 100 - (int.Parse(skipChance.text));
     }
 
     public void setMaxInRow()
     {
-        if(int.Parse(maxInRow.text) > 0)
+        if (int.Parse(maxInRow.text) > 1)
             maxInaRow = int.Parse(maxInRow.text);
+        else
+            maxInRow.text = maxInaRow.ToString();
     }
 
     public void setMaxJump()
     {
-        if(int.Parse(maxJumpInput.text) > 0)
+        if (int.Parse(maxJumpInput.text) > 1)
             maxJump = int.Parse(maxJumpInput.text);
+        else
+            maxJumpInput.text = maxJump.ToString();
     }
     
     public void playAll()
     {
-        drums.time = 4.15f;
-        play = true;
+        
         mainCounter = 0f;
         
-        drums.Play();
-        background.Play();
+        if (float.Parse(backgroundStartOffset.text) > 0)
+            StartCoroutine(playSoundWithDelay(background, float.Parse(backgroundStartOffset.text)));
+        else
+        {
+            background.time = float.Parse(backgroundStartOffset.text) * -1;
+            background.Play();
+        }
+            
+        
+        if (float.Parse(drumsStartOffset.text) > 0)
+            StartCoroutine(playSoundWithDelay(drums, float.Parse(drumsStartOffset.text)));
+        else
+        {
+            drums.time = float.Parse(drumsStartOffset.text) * -1 ; 
+            drums.Play();
+        }
+            
+        
+        if (float.Parse(customStartOffset.text) > 0)
+            StartCoroutine(playSoundWithDelay(custom, float.Parse(customStartOffset.text)));
+        else
+        {
+            custom.time = float.Parse(customStartOffset.text) * -1;
+            custom.Play();
+        }
+            
+        
+        if (float.Parse(generatedStartOffset.text) > 0)
+            StartCoroutine(playGeneratedWithDelay(float.Parse(generatedStartOffset.text)));
+        else
+            play = true;
+        
+        
+    }
+    
+    IEnumerator playSoundWithDelay(AudioSource source, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        source.Play();
+    }
+    
+    IEnumerator playGeneratedWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        play = true;
     }
 
     public void playBackground()
     {
-        drums.time = 4.15f;
         mainCounter = 0f;
         drums.Play();
         background.Play();
@@ -487,6 +543,9 @@ public class Play : MonoBehaviour
         play = false;
         drums.Stop();
         background.Stop();
+        generated.Stop();
+        custom.Stop();
+        clearPianoKeys();
     }
 
     public void stopBackground()
@@ -498,20 +557,9 @@ public class Play : MonoBehaviour
     public void stopGenerated()
     {
         play = false;
+        clearPianoKeys();
     }
-    
-    
-    /*IEnumerator SoundOut()
-    {
-        while (true)
-        {
-            test.pitch = table2[Random.Range(0, 7)];
-            test.Play();
-            yield return new WaitForSeconds(0.375f);
-            
-        }
-    }*/
-    
+
 
     public void normalPitch()
     {
@@ -577,56 +625,76 @@ public class Play : MonoBehaviour
     {
         generated.pitch = (float)Math.Pow(2, 11f / 12f);//(float)Math.Pow(1.0594630943592953, 11);
         generated.Play();
+        
     }
     
 
     // Update is called once per frame
     void Update()
     {
-
         if (play)
         {
-
+            
             mainCounter += Time.deltaTime;
-           
+            
            if (mainCounter % secondsPerBeat >= 0 && mainCounter % secondsPerBeat < 0.1f && played == false && play)
            {
                previousRand = rand;
                
-               rand = Random.Range(0, 8);
+               rand = Random.Range(0, 7);
                
-               
-               while (tickCounter > 1 && (previousRand - rand > maxJump || previousRand - rand < (maxJump*-1)) || replayCounter >= maxInaRow)
+               while (whileCounter < 3 && tickCounter > 1 && (previousRand - rand > maxJump || previousRand - rand < (maxJump*-1)) || replayCounter >= maxInaRow)
                {
-                   rand = Random.Range(0, 8);
+                   rand = Random.Range(0, 7);
+                   whileCounter++;
                }
-                
                
+               whileCounter = 0;
+               
+               clearPianoKeys();
                
                gap = Random.Range(1, 100);
-
-               if (gap < chanceToSkip)
+               
+               
+               if (gap < chanceToPlay)
                {
                    generated.pitch = usedSounds[rand];
+                   generated.Play();
+
+                   if (generated.clip != null)
+                   {
+                       if (sampleNote + scale[rand] > 11)
+                           pianoImages[sampleNote + scale[rand] - 12].GetComponent<Image>().enabled = true;
+                       else if (sampleNote + scale[rand] < 0)
+                       {
+                           pianoImages[sampleNote + scale[rand] + 12].GetComponent<Image>().enabled = true;
+                       }
+                       else
+                           pianoImages[sampleNote + scale[rand]].GetComponent<Image>().enabled = true;
+                   }
 
                    if (previousRand == rand)
                        replayCounter++;
                    else
                        replayCounter = 0;
-                   
-                   generated.Play();
-                   pitchText.text = rand.ToString();
                }
                played = true;
-               tickCounter++;
                Invoke("resetPlayed", 0.2f);
+               tickCounter++;
            }
         }
-
     }
 
     public void resetPlayed()
     {
         played = false;
+    }
+
+    public void clearPianoKeys()
+    {
+        for (int i = 0; i < 12; i++)
+        {
+            pianoImages[i].GetComponent<Image>().enabled = false;
+        }
     }
 }

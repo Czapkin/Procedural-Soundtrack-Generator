@@ -1,7 +1,5 @@
 ScriptsOnlyBuild:
   usedScripts:
-    Assembly-CSharp.dll:
-    - Play
     FMODUnity.dll:
     - FMODUnity.PlatformAndroid
     - FMODUnity.PlatformAppleTV
@@ -17,6 +15,9 @@ ScriptsOnlyBuild:
     - FMODUnity.Settings
     FMODUnityEditor.dll:
     - FMODUnity.EventCache
+    Scripts.dll:
+    - Play
+    - RecordToWav
     Unity.Rider.Editor.dll:
     - Packages.Rider.Editor.RiderScriptEditorData
     - Packages.Rider.Editor.UnitTesting.CallbackData
@@ -27,20 +28,81 @@ ScriptsOnlyBuild:
     - TMPro.TMP_StyleSheet
     - TMPro.TextMeshProUGUI
     UnityEditor.TestRunner.dll:
+    - TestRunner.Callbacks.WindowResultUpdaterDataHolder
     - UnityEditor.TestTools.TestRunner.Api.CallbacksHolder
     - UnityEditor.TestTools.TestRunner.TestListCacheData
     - UnityEditor.TestTools.TestRunner.TestRun.TestJobDataHolder
+    - UnityEditor.TestTools.TestRunner.TestRunnerWindow
     UnityEngine.UI.dll:
     - UnityEngine.EventSystems.EventSystem
     - UnityEngine.EventSystems.StandaloneInputModule
     - UnityEngine.UI.Button
     - UnityEngine.UI.CanvasScaler
+    - UnityEngine.UI.Dropdown
     - UnityEngine.UI.GraphicRaycaster
     - UnityEngine.UI.Image
     - UnityEngine.UI.InputField
+    - UnityEngine.UI.Mask
+    - UnityEngine.UI.ScrollRect
+    - UnityEngine.UI.Scrollbar
+    - UnityEngine.UI.Slider
     - UnityEngine.UI.Text
+    - UnityEngine.UI.Toggle
   sceneClasses:
-    Assets/Scenes/SampleScene.unity:
+    Assets/Scenes/Help.unity:
+    - Class: 1
+      Script: {instanceID: 0}
+    - Class: 4
+      Script: {instanceID: 0}
+    - Class: 20
+      Script: {instanceID: 0}
+    - Class: 21
+      Script: {instanceID: 0}
+    - Class: 28
+      Script: {instanceID: 0}
+    - Class: 48
+      Script: {instanceID: 0}
+    - Class: 81
+      Script: {instanceID: 0}
+    - Class: 104
+      Script: {instanceID: 0}
+    - Class: 108
+      Script: {instanceID: 0}
+    - Class: 114
+      Script: {instanceID: 11946}
+    - Class: 114
+      Script: {instanceID: 12196}
+    - Class: 114
+      Script: {instanceID: 12282}
+    - Class: 114
+      Script: {instanceID: 12682}
+    - Class: 114
+      Script: {instanceID: 13190}
+    - Class: 114
+      Script: {instanceID: 13460}
+    - Class: 114
+      Script: {instanceID: 13714}
+    - Class: 114
+      Script: {instanceID: 13780}
+    - Class: 114
+      Script: {instanceID: 14212}
+    - Class: 115
+      Script: {instanceID: 0}
+    - Class: 128
+      Script: {instanceID: 0}
+    - Class: 157
+      Script: {instanceID: 0}
+    - Class: 196
+      Script: {instanceID: 0}
+    - Class: 213
+      Script: {instanceID: 0}
+    - Class: 222
+      Script: {instanceID: 0}
+    - Class: 223
+      Script: {instanceID: 0}
+    - Class: 224
+      Script: {instanceID: 0}
+    Assets/Scenes/Main.unity:
     - Class: 1
       Script: {instanceID: 0}
     - Class: 4
@@ -70,6 +132,8 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 12154}
     - Class: 114
+      Script: {instanceID: 12156}
+    - Class: 114
       Script: {instanceID: 12196}
     - Class: 114
       Script: {instanceID: 12258}
@@ -79,6 +143,8 @@ ScriptsOnlyBuild:
       Script: {instanceID: 12346}
     - Class: 114
       Script: {instanceID: 12508}
+    - Class: 114
+      Script: {instanceID: 12572}
     - Class: 114
       Script: {instanceID: 12584}
     - Class: 114
@@ -90,6 +156,8 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 12794}
     - Class: 114
+      Script: {instanceID: 12934}
+    - Class: 114
       Script: {instanceID: 13118}
     - Class: 114
       Script: {instanceID: 13190}
@@ -100,23 +168,33 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 13476}
     - Class: 114
-      Script: {instanceID: 13626}
+      Script: {instanceID: 13554}
     - Class: 114
-      Script: {instanceID: 13712}
+      Script: {instanceID: 13628}
     - Class: 114
-      Script: {instanceID: 13778}
+      Script: {instanceID: 13714}
     - Class: 114
-      Script: {instanceID: 13820}
+      Script: {instanceID: 13780}
     - Class: 114
-      Script: {instanceID: 13830}
+      Script: {instanceID: 13824}
     - Class: 114
-      Script: {instanceID: 13900}
+      Script: {instanceID: 13834}
     - Class: 114
-      Script: {instanceID: 13976}
+      Script: {instanceID: 13906}
     - Class: 114
-      Script: {instanceID: 14206}
+      Script: {instanceID: 13982}
     - Class: 114
-      Script: {instanceID: 14264}
+      Script: {instanceID: 14196}
+    - Class: 114
+      Script: {instanceID: 14212}
+    - Class: 114
+      Script: {instanceID: 14232}
+    - Class: 114
+      Script: {instanceID: 14250}
+    - Class: 114
+      Script: {instanceID: 14270}
+    - Class: 114
+      Script: {instanceID: 16146}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -248,8 +326,8 @@ ScriptsOnlyBuild:
     className: GridLayoutGroup
   - hash:
       serializedVersion: 2
-      Hash: 5d5bb1ab5ae66b2d814a4be26efeb8e3
-    assemblyName: Assembly-CSharp.dll
+      Hash: 094e74ff10334707c529567f3cd532b6
+    assemblyName: Scripts.dll
     namespaceName: 
     className: Play
   - hash:
@@ -518,8 +596,14 @@ ScriptsOnlyBuild:
     className: TimelineAsset
   - hash:
       serializedVersion: 2
+      Hash: 5ca217dd33624ceb6b9bdb067fec3962
+    assemblyName: Scripts.dll
+    namespaceName: 
+    className: RecordToWav
+  - hash:
+      serializedVersion: 2
       Hash: 82635adac3c8a8bb1caf06ed232c725b
-    assemblyName: Assembly-CSharp.dll
+    assemblyName: Scripts.dll
     namespaceName: 
     className: FileSelectorStyles
   - hash:
@@ -585,7 +669,7 @@ ScriptsOnlyBuild:
   - hash:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
-    assemblyName: Assembly-CSharp.dll
+    assemblyName: Scripts.dll
     namespaceName: 
     className: FileSelectorExample
   - hash:
@@ -669,7 +753,7 @@ ScriptsOnlyBuild:
   - hash:
       serializedVersion: 2
       Hash: 00745ca807c801ae0501dbc617340bb6
-    assemblyName: Assembly-CSharp.dll
+    assemblyName: Scripts.dll
     namespaceName: 
     className: FileSelector
   - hash:
@@ -722,5 +806,7 @@ ScriptsOnlyBuild:
     className: PlayableTrack
   platform: 5
   scenePathNames:
-  - Assets/Scenes/SampleScene.unity
-  playerPath: "D:/Unity projekty/Builds/Gen5/Generowanie \u015Bcie\u017Cki d\u017Awi\u0119kowej.exe"
+  - Assets/Scenes/Main.unity
+  - Assets/Scenes/Help.unity
+  playerPath: "D:/Unity projekty/Builds/Generowaniev1.3.2/Generowanie \u015Bcie\u017Cki
+    d\u017Awi\u0119kowej.exe"
